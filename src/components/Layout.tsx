@@ -7,9 +7,9 @@ import { API_BASE_URL } from '../config';
 import ThemeToggle from './ThemeToggle';
 
 const NAV_ITEMS = [
-  { to: '/orders/new', label: 'Place Order' },
-  { to: '/orders', label: 'Order History' },
-  { to: '/portfolios', label: 'Portfolios' },
+  { to: '/orders/new', label: 'Place Order', end: true },
+  { to: '/orders', label: 'Order History', end: true },
+  { to: '/portfolios', label: 'Portfolios', end: true },
 ];
 
 function HealthIndicator() {
@@ -48,6 +48,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 <NavLink
                   key={item.to}
                   to={item.to}
+                  end={item.end}
                   className={({ isActive }) =>
                     clsx(
                       'rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
