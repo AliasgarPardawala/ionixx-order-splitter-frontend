@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useForm, useFieldArray, type SubmitHandler } from 'react-hook-form';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -27,7 +27,11 @@ const EMPTY_POSITION: PositionFormValue = { symbol: '', weight: '', price: '' };
 const INPUT_CLASS =
   'rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 placeholder-slate-400 focus:border-slate-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-slate-400';
 
-function AllocationResult({ order }: { order: Order }) {
+function formatDuration(ms: number): string {
+  return ms < 1000 ? `${Math.round(ms)} ms` : `${(ms / 1000).toFixed(2)} s`;
+}
+
+function AllocationResult({ order, durationMs }: { order: Order; durationMs: number | null }) {
   return (
     <div className="space-y-4 rounded-lg border border-emerald-200 bg-emerald-50/40 p-5 dark:border-emerald-900 dark:bg-emerald-950/20">
       <div className="flex flex-wrap items-center gap-3">
@@ -36,7 +40,7 @@ function AllocationResult({ order }: { order: Order }) {
         <OrderStatusBadge status={order.status} />
         <span className="font-mono text-xs text-slate-500 dark:text-slate-400">{order.orderId}</span>
       </div>
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm sm:grid-cols-4">
+      <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm sm:grid-cols-5">
         <div>
           <dt className="text-slate-500 dark:text-slate-400">Total amount</dt>
           <dd className="font-medium text-slate-900 dark:text-white">${order.totalAmount.toFixed(2)}</dd>
@@ -55,6 +59,12 @@ function AllocationResult({ order }: { order: Order }) {
           <dt className="text-slate-500 dark:text-slate-400">Executes (UTC)</dt>
           <dd className="font-medium text-slate-900 dark:text-white">
             {new Date(order.executionAt).toISOString().replace('T', ' ').slice(0, 19)}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-slate-500 dark:text-slate-400">Placed in</dt>
+          <dd className="font-medium text-slate-900 dark:text-white">
+            {durationMs !== null ? formatDuration(durationMs) : '—'}
           </dd>
         </div>
       </dl>
@@ -89,6 +99,8 @@ function AllocationResult({ order }: { order: Order }) {
 export default function PlaceOrderPage() {
   const [searchParams] = useSearchParams();
   const [lastOrder, setLastOrder] = useState<Order | null>(null);
+  const [placedInMs, setPlacedInMs] = useState<number | null>(null);
+  const orderStartRef = useRef(0);
   const preselectedPortfolioId = searchParams.get('portfolioId') ?? '';
 
   const { data: portfoliosPage } = useQuery({
@@ -118,7 +130,10 @@ export default function PlaceOrderPage() {
 
   const mutation = useMutation({
     mutationFn: placeOrder,
-    onSuccess: (order) => setLastOrder(order),
+    onSuccess: (order) => {
+      setLastOrder(order);
+      setPlacedInMs(performance.now() - orderStartRef.current);
+    },
   });
 
   const onSubmit: SubmitHandler<OrderFormValues> = (values) => {
@@ -139,6 +154,7 @@ export default function PlaceOrderPage() {
             },
           };
 
+    orderStartRef.current = performance.now();
     mutation.mutate(input);
   };
 
@@ -282,6 +298,7 @@ export default function PlaceOrderPage() {
               type="button"
               onClick={() => {
                 setLastOrder(null);
+                setPlacedInMs(null);
                 reset();
               }}
               className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
@@ -292,7 +309,7 @@ export default function PlaceOrderPage() {
         </div>
       </form>
 
-      {lastOrder ? <AllocationResult order={lastOrder} /> : null}
+      {lastOrder ? <AllocationResult order={lastOrder} durationMs={placedInMs} /> : null}
     </div>
   );
 }
