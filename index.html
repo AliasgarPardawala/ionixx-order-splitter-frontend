@@ -5,6 +5,23 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Order Splitter</title>
+    <script>
+      // Applied before React mounts so there's no flash of the wrong theme.
+      // Kept in sync with src/hooks/useTheme.ts.
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme');
+          var preference = stored === 'light' || stored === 'dark' ? stored : 'system';
+          var isDark =
+            preference === 'dark' ||
+            (preference === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.classList.toggle('dark', isDark);
+          document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+        } catch (e) {
+          /* localStorage unavailable (e.g. private mode) — fall back to light */
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

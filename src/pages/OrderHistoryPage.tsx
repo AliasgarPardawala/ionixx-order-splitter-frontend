@@ -14,6 +14,8 @@ interface Filters {
 }
 
 const EMPTY_FILTERS: Filters = { symbol: '', orderType: '', status: '', from: '', to: '' };
+const INPUT_CLASS =
+  'rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 placeholder-slate-400 focus:border-slate-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-slate-400';
 
 function toEpochMillis(dateStr: string, endOfDay: boolean): number | undefined {
   if (!dateStr) return undefined;
@@ -56,24 +58,24 @@ export default function OrderHistoryPage() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-base font-semibold text-slate-900">Order history</h2>
+      <h2 className="text-base font-semibold text-slate-900 dark:text-white">Order history</h2>
 
-      <div className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4">
+      <div className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
         <div>
-          <label className="block text-xs font-medium text-slate-500">Symbol</label>
+          <label className="block text-xs font-medium text-slate-500 dark:text-slate-400">Symbol</label>
           <input
             value={filters.symbol}
             onChange={(e) => updateFilter('symbol', e.target.value)}
             placeholder="AAPL"
-            className="mt-1 w-28 rounded-md border border-slate-300 px-2 py-1.5 text-sm uppercase focus:border-slate-500 focus:outline-none"
+            className={`mt-1 w-28 uppercase ${INPUT_CLASS}`}
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-500">Order type</label>
+          <label className="block text-xs font-medium text-slate-500 dark:text-slate-400">Order type</label>
           <select
             value={filters.orderType}
             onChange={(e) => updateFilter('orderType', e.target.value as OrderType | '')}
-            className="mt-1 rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
+            className={`mt-1 ${INPUT_CLASS}`}
           >
             <option value="">Any</option>
             <option value="BUY">BUY</option>
@@ -81,11 +83,11 @@ export default function OrderHistoryPage() {
           </select>
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-500">Status</label>
+          <label className="block text-xs font-medium text-slate-500 dark:text-slate-400">Status</label>
           <select
             value={filters.status}
             onChange={(e) => updateFilter('status', e.target.value as OrderStatus | '')}
-            className="mt-1 rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
+            className={`mt-1 ${INPUT_CLASS}`}
           >
             <option value="">Any</option>
             <option value="PENDING_EXECUTION">PENDING_EXECUTION</option>
@@ -93,21 +95,21 @@ export default function OrderHistoryPage() {
           </select>
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-500">From</label>
+          <label className="block text-xs font-medium text-slate-500 dark:text-slate-400">From</label>
           <input
             type="date"
             value={filters.from}
             onChange={(e) => updateFilter('from', e.target.value)}
-            className="mt-1 rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
+            className={`mt-1 ${INPUT_CLASS}`}
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-500">To</label>
+          <label className="block text-xs font-medium text-slate-500 dark:text-slate-400">To</label>
           <input
             type="date"
             value={filters.to}
             onChange={(e) => updateFilter('to', e.target.value)}
-            className="mt-1 rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
+            className={`mt-1 ${INPUT_CLASS}`}
           />
         </div>
         <button
@@ -116,20 +118,22 @@ export default function OrderHistoryPage() {
             setFilters(EMPTY_FILTERS);
             setPage(1);
           }}
-          className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
+          className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
         >
           Clear
         </button>
       </div>
 
       <ErrorBanner error={error} />
-      {isLoading ? <p className="text-sm text-slate-500">Loading…</p> : null}
-      {data && data.data.length === 0 ? <p className="text-sm text-slate-500">No orders match these filters.</p> : null}
+      {isLoading ? <p className="text-sm text-slate-500 dark:text-slate-400">Loading…</p> : null}
+      {data && data.data.length === 0 ? (
+        <p className="text-sm text-slate-500 dark:text-slate-400">No orders match these filters.</p>
+      ) : null}
 
       {data && data.data.length > 0 ? (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
           <table className="w-full text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+            <thead className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400">
               <tr>
                 <th className="px-3 py-2">Order</th>
                 <th className="px-3 py-2">Type</th>
@@ -143,32 +147,38 @@ export default function OrderHistoryPage() {
             <tbody>
               {data.data.map((order) => (
                 <Fragment key={order.orderId}>
-                  <tr key={order.orderId} className="border-b border-slate-100 last:border-0">
-                    <td className="px-3 py-2 font-mono text-xs text-slate-600">{order.orderId.slice(0, 8)}…</td>
+                  <tr className="border-b border-slate-100 last:border-0 dark:border-slate-800">
+                    <td className="px-3 py-2 font-mono text-xs text-slate-600 dark:text-slate-400">
+                      {order.orderId.slice(0, 8)}…
+                    </td>
                     <td className="px-3 py-2">
                       <OrderTypeBadge orderType={order.orderType} />
                     </td>
                     <td className="px-3 py-2">
                       <OrderStatusBadge status={order.status} />
                     </td>
-                    <td className="px-3 py-2 text-slate-600">${order.totalAmount.toFixed(2)}</td>
-                    <td className="px-3 py-2 text-slate-500">{new Date(order.createdAt).toISOString().replace('T', ' ').slice(0, 19)}</td>
-                    <td className="px-3 py-2 text-slate-500">{new Date(order.executionAt).toISOString().replace('T', ' ').slice(0, 19)}</td>
+                    <td className="px-3 py-2 text-slate-600 dark:text-slate-300">${order.totalAmount.toFixed(2)}</td>
+                    <td className="px-3 py-2 text-slate-500 dark:text-slate-400">
+                      {new Date(order.createdAt).toISOString().replace('T', ' ').slice(0, 19)}
+                    </td>
+                    <td className="px-3 py-2 text-slate-500 dark:text-slate-400">
+                      {new Date(order.executionAt).toISOString().replace('T', ' ').slice(0, 19)}
+                    </td>
                     <td className="px-3 py-2 text-right">
                       <button
                         type="button"
                         onClick={() => toggleExpanded(order.orderId)}
-                        className="text-sm font-medium text-slate-600 hover:text-slate-900"
+                        className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                       >
                         {expanded.has(order.orderId) ? 'Hide' : 'Details'}
                       </button>
                     </td>
                   </tr>
                   {expanded.has(order.orderId) ? (
-                    <tr key={`${order.orderId}-detail`} className="border-b border-slate-100 bg-slate-50/60 last:border-0">
+                    <tr className="border-b border-slate-100 bg-slate-50/60 last:border-0 dark:border-slate-800 dark:bg-slate-800/30">
                       <td colSpan={7} className="px-3 py-3">
                         <table className="w-full text-xs">
-                          <thead className="text-left uppercase tracking-wide text-slate-400">
+                          <thead className="text-left uppercase tracking-wide text-slate-400 dark:text-slate-500">
                             <tr>
                               <th className="py-1 pr-4">Symbol</th>
                               <th className="py-1 pr-4">Weight</th>
@@ -180,11 +190,11 @@ export default function OrderHistoryPage() {
                           <tbody>
                             {order.allocations.map((a) => (
                               <tr key={a.symbol}>
-                                <td className="py-1 pr-4 font-medium text-slate-800">{a.symbol}</td>
-                                <td className="py-1 pr-4 text-slate-600">{(a.weight * 100).toFixed(2)}%</td>
-                                <td className="py-1 pr-4 text-slate-600">${a.amount.toFixed(2)}</td>
-                                <td className="py-1 pr-4 text-slate-600">${a.price.toFixed(2)}</td>
-                                <td className="py-1 pr-4 text-slate-600">{a.quantity}</td>
+                                <td className="py-1 pr-4 font-medium text-slate-800 dark:text-slate-200">{a.symbol}</td>
+                                <td className="py-1 pr-4 text-slate-600 dark:text-slate-300">{(a.weight * 100).toFixed(2)}%</td>
+                                <td className="py-1 pr-4 text-slate-600 dark:text-slate-300">${a.amount.toFixed(2)}</td>
+                                <td className="py-1 pr-4 text-slate-600 dark:text-slate-300">${a.price.toFixed(2)}</td>
+                                <td className="py-1 pr-4 text-slate-600 dark:text-slate-300">{a.quantity}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -204,17 +214,17 @@ export default function OrderHistoryPage() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className="rounded-md border border-slate-300 px-2 py-1 disabled:opacity-40"
+            className="rounded-md border border-slate-300 px-2 py-1 disabled:opacity-40 dark:border-slate-700"
           >
             Prev
           </button>
-          <span className="text-slate-500">
+          <span className="text-slate-500 dark:text-slate-400">
             Page {page} of {Math.ceil(data.pagination.total / data.pagination.limit)}
           </span>
           <button
             onClick={() => setPage((p) => p + 1)}
             disabled={page * data.pagination.limit >= data.pagination.total}
-            className="rounded-md border border-slate-300 px-2 py-1 disabled:opacity-40"
+            className="rounded-md border border-slate-300 px-2 py-1 disabled:opacity-40 dark:border-slate-700"
           >
             Next
           </button>

@@ -17,6 +17,8 @@ interface PortfolioFormValues {
 }
 
 const EMPTY_POSITION: PositionFormValue = { symbol: '', weight: '', price: '' };
+const INPUT_CLASS =
+  'rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 placeholder-slate-400 focus:border-slate-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-slate-400';
 
 function weightSum(positions: PositionFormValue[]): number {
   return positions.reduce((sum, p) => sum + (Number(p.weight) || 0), 0);
@@ -58,21 +60,19 @@ function PortfolioForm({ onCreated }: { onCreated: () => void }) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 rounded-lg border border-slate-200 bg-white p-5">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="space-y-4 rounded-lg border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900"
+    >
       <div>
-        <label className="block text-sm font-medium text-slate-700">Name (optional)</label>
-        <input
-          {...register('name')}
-          type="text"
-          placeholder="Balanced Growth"
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
-        />
+        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Name (optional)</label>
+        <input {...register('name')} type="text" placeholder="Balanced Growth" className={`mt-1 w-full ${INPUT_CLASS}`} />
       </div>
 
       <div>
         <div className="mb-1 flex items-center justify-between">
-          <label className="block text-sm font-medium text-slate-700">Positions</label>
-          <span className={sumOk ? 'text-xs text-emerald-600' : 'text-xs text-amber-600'}>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Positions</label>
+          <span className={sumOk ? 'text-xs text-emerald-600 dark:text-emerald-400' : 'text-xs text-amber-600 dark:text-amber-400'}>
             Weights sum to {sum.toFixed(4)} {sumOk ? '✓' : '(must be 1.0 ± 0.005)'}
           </span>
         </div>
@@ -82,7 +82,7 @@ function PortfolioForm({ onCreated }: { onCreated: () => void }) {
               <input
                 {...register(`positions.${index}.symbol` as const, { required: true })}
                 placeholder="AAPL"
-                className="w-24 rounded-md border border-slate-300 px-2 py-1.5 text-sm uppercase focus:border-slate-500 focus:outline-none"
+                className={`w-24 uppercase ${INPUT_CLASS}`}
               />
               <input
                 {...register(`positions.${index}.weight` as const, { required: true })}
@@ -91,7 +91,7 @@ function PortfolioForm({ onCreated }: { onCreated: () => void }) {
                 min={0}
                 max={1}
                 placeholder="weight (0-1)"
-                className="w-32 rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
+                className={`w-32 ${INPUT_CLASS}`}
               />
               <input
                 {...register(`positions.${index}.price` as const)}
@@ -99,24 +99,26 @@ function PortfolioForm({ onCreated }: { onCreated: () => void }) {
                 step="any"
                 min={0}
                 placeholder="price override (optional)"
-                className="w-48 rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
+                className={`w-48 ${INPUT_CLASS}`}
               />
               <button
                 type="button"
                 onClick={() => remove(index)}
                 disabled={fields.length <= 1}
-                className="rounded-md px-2 py-1 text-sm text-slate-400 hover:text-rose-600 disabled:opacity-30"
+                className="rounded-md px-2 py-1 text-sm text-slate-400 hover:text-rose-600 disabled:opacity-30 dark:text-slate-500 dark:hover:text-rose-400"
               >
                 Remove
               </button>
             </div>
           ))}
         </div>
-        {errors.positions ? <p className="mt-1 text-xs text-rose-600">Every position needs a symbol and a weight.</p> : null}
+        {errors.positions ? (
+          <p className="mt-1 text-xs text-rose-600 dark:text-rose-400">Every position needs a symbol and a weight.</p>
+        ) : null}
         <button
           type="button"
           onClick={() => append({ ...EMPTY_POSITION })}
-          className="mt-2 text-sm font-medium text-slate-600 hover:text-slate-900"
+          className="mt-2 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
         >
           + Add position
         </button>
@@ -127,7 +129,7 @@ function PortfolioForm({ onCreated }: { onCreated: () => void }) {
       <button
         type="submit"
         disabled={mutation.isPending}
-        className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+        className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
       >
         {mutation.isPending ? 'Registering…' : 'Register portfolio'}
       </button>
@@ -148,21 +150,21 @@ export default function PortfoliosPage() {
   return (
     <div className="space-y-8">
       <section>
-        <h2 className="mb-3 text-base font-semibold text-slate-900">Register a model portfolio</h2>
+        <h2 className="mb-3 text-base font-semibold text-slate-900 dark:text-white">Register a model portfolio</h2>
         <PortfolioForm onCreated={refresh} />
       </section>
 
       <section>
-        <h2 className="mb-3 text-base font-semibold text-slate-900">Registered portfolios</h2>
+        <h2 className="mb-3 text-base font-semibold text-slate-900 dark:text-white">Registered portfolios</h2>
         <ErrorBanner error={error} />
-        {isLoading ? <p className="text-sm text-slate-500">Loading…</p> : null}
+        {isLoading ? <p className="text-sm text-slate-500 dark:text-slate-400">Loading…</p> : null}
         {data && data.data.length === 0 ? (
-          <p className="text-sm text-slate-500">No portfolios registered yet.</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">No portfolios registered yet.</p>
         ) : null}
         {data && data.data.length > 0 ? (
-          <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+          <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
             <table className="w-full text-sm">
-              <thead className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+              <thead className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400">
                 <tr>
                   <th className="px-4 py-2">Name</th>
                   <th className="px-4 py-2">Positions</th>
@@ -172,16 +174,16 @@ export default function PortfoliosPage() {
               </thead>
               <tbody>
                 {data.data.map((portfolio) => (
-                  <tr key={portfolio.portfolioId} className="border-b border-slate-100 last:border-0">
-                    <td className="px-4 py-2 font-medium text-slate-900">{portfolio.name || '(untitled)'}</td>
-                    <td className="px-4 py-2 text-slate-600">
+                  <tr key={portfolio.portfolioId} className="border-b border-slate-100 last:border-0 dark:border-slate-800">
+                    <td className="px-4 py-2 font-medium text-slate-900 dark:text-white">{portfolio.name || '(untitled)'}</td>
+                    <td className="px-4 py-2 text-slate-600 dark:text-slate-300">
                       {portfolio.positions.map((p) => `${p.symbol} ${(p.weight * 100).toFixed(1)}%`).join(', ')}
                     </td>
-                    <td className="px-4 py-2 text-slate-500">{new Date(portfolio.createdAt).toLocaleString()}</td>
+                    <td className="px-4 py-2 text-slate-500 dark:text-slate-400">{new Date(portfolio.createdAt).toLocaleString()}</td>
                     <td className="px-4 py-2 text-right">
                       <Link
                         to={`/orders/new?portfolioId=${portfolio.portfolioId}`}
-                        className="text-sm font-medium text-slate-700 hover:text-slate-900 hover:underline"
+                        className="text-sm font-medium text-slate-700 hover:text-slate-900 hover:underline dark:text-slate-300 dark:hover:text-white"
                       >
                         Use for order →
                       </Link>
@@ -197,15 +199,15 @@ export default function PortfoliosPage() {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1}
-              className="rounded-md border border-slate-300 px-2 py-1 disabled:opacity-40"
+              className="rounded-md border border-slate-300 px-2 py-1 disabled:opacity-40 dark:border-slate-700"
             >
               Prev
             </button>
-            <span className="text-slate-500">Page {page}</span>
+            <span className="text-slate-500 dark:text-slate-400">Page {page}</span>
             <button
               onClick={() => setPage((p) => p + 1)}
               disabled={page * data.pagination.limit >= data.pagination.total}
-              className="rounded-md border border-slate-300 px-2 py-1 disabled:opacity-40"
+              className="rounded-md border border-slate-300 px-2 py-1 disabled:opacity-40 dark:border-slate-700"
             >
               Next
             </button>

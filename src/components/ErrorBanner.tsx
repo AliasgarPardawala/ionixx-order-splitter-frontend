@@ -17,13 +17,15 @@ export default function ErrorBanner({ error }: { error: unknown }) {
   const code = error instanceof ApiRequestError ? error.code : undefined;
 
   return (
-    <div className="rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">
+    <div className="rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-300">
       <p className="font-medium">
         {message}
-        {code ? <span className="ml-2 font-mono text-xs text-rose-500">[{code}]</span> : null}
+        {code ? <span className="ml-2 font-mono text-xs text-rose-500 dark:text-rose-400">[{code}]</span> : null}
       </p>
       {details ? (
-        <pre className="mt-2 overflow-x-auto rounded bg-rose-100/60 p-2 text-xs text-rose-700">{details}</pre>
+        <pre className="mt-2 overflow-x-auto rounded bg-rose-100/60 p-2 text-xs text-rose-700 dark:bg-rose-950/50 dark:text-rose-300">
+          {details}
+        </pre>
       ) : null}
     </div>
   );
